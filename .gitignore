@@ -1,3 +1,4 @@
 *.so
 *.o
+*.pyc
 calc_gc_depth/calc_gc_depth.c
