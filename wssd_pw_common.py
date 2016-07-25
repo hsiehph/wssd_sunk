@@ -96,7 +96,7 @@ class genome_data:
         mask_chr = mask_chr==None and chr or mask_chr
         #IF IT's A SUNK MASK -> different 
         if self.sunk_based:
-            masked_region = mask['isntSunkOrIsMasked'][mask_chr][start:end]
+            masked_region = mask['isntSunkOrIsMasked'][mask_chr][start:end,:]
         else:
             masked_region = mask['mask'][mask_chr][start:end,:].sum(1)>0
 
