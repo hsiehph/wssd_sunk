@@ -68,11 +68,6 @@ if __name__=='__main__':
         chr=regions_chrms[xi]
         start,end= regions_coords[xi]
         wnds = regions_wnds[xi]
-
-        #20170216: Added fix for case where contig has only 1 sunk window
-        # Previously, it would throw an IndexError with array out of bounds
-        if wnds.shape[0] == 1:
-            wnds[0][1] = wnds[0][1] - 1
         
         #if chr!="chr20": continue
 
