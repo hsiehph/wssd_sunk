@@ -1,28 +1,13 @@
+from __future__ import print_function
+
 import sys
-import socket
 import os
-import os.path
 from optparse import OptionParser
 #import scipy as scp
 import numpy as np
 import matplotlib.pyplot as plt
-import pylab
 
-import genome_management.kg_file_handling as kgf
-import math
-
-def file_exists(ls,file):
-    for f in ls:
-        if(f==file):
-            return 1
-    return 0
-
-def mkdir(dir,file):
-    ls_dir = os.listdir(dir)
-    if(not(file_exists(ls_dir,file))):
-        command = "mkdir %s/%s"%(dir,file)
-        os.system(command)
-    return "%s/%s"%(dir,file)
+import kg_file_handling as kgf
 
 class region_info:
     def __init__(self,name,chr,start,end,TID):
@@ -86,7 +71,7 @@ def make_output_file(region,region_info,outdir,cell_line_info,genome_info):
         output = indiv in cell_line_info and cell_line_info[indiv] or ""
         output = "%s,%d,%s,%s,%f\n"%(indiv,cp,pop,output,genome_info.genomes[indiv].coverage)
         FOUT.write(output)
-        print output    
+        print(output)
 
 def make_simple_plot(region,region_info,outdir,cell_line_info,genome_info):
 
@@ -118,7 +103,7 @@ def make_simple_plot(region,region_info,outdir,cell_line_info,genome_info):
 
 def make_histogram(region,region_info,outdir,great_ape_gene_hashes):
 
-    print region_info.name
+    print(region_info.name)
 
     plt.rc('grid',color='0.75',linestyle='l',linewidth='0.1')
     f=plt.figure()
@@ -135,8 +120,8 @@ def make_histogram(region,region_info,outdir,great_ape_gene_hashes):
         for ape,gene_hash in great_ape_gene_hashes.iteritems():
             if not region_info.TID in gene_hash:
                 do_apes=False
-                print "ID does not exist for APE"
-                print region_info.TID
+                print("ID does not exist for APE")
+                print(region_info.TID)
                 break
             great_ape_cps[ape] = gene_hash[region_info.TID]
             mx=int(max(great_ape_cps[ape],mx))
@@ -159,14 +144,14 @@ def make_histogram(region,region_info,outdir,great_ape_gene_hashes):
 
     pop_to_hists = {}
     for pop,freq_info in region_info.frequencies_by_pop.iteritems():
-        print pop,freq_info
+        print(pop,freq_info)
         pop_to_hists[pop] = np.histogram(np.array(freq_info),bins=nbins,range=[mn,mx],normed=True,new=True)[0]
-        print  np.histogram(np.array(freq_info),bins=nbins,range=[mn,mx],normed=True,new=True)
-        print pop_to_hists[pop]
+        print(np.histogram(np.array(freq_info),bins=nbins,range=[mn,mx],normed=True,new=True))
+        print(pop_to_hists[pop])
 
     x = np.arange(mn,mx+1)
     width=.25
-    print x
+    print(x)
     
     for i in range(x.shape[0]):
         labels.append(str(x[i]))    
@@ -234,7 +219,7 @@ def make_histogram(region,region_info,outdir,great_ape_gene_hashes):
     
     #legend(leg)
     title("percent")
-    print leg
+    print(leg)
     legend(leg)
     
     f.get_axes()[0].xaxis.set_ticks(range(21))
@@ -258,26 +243,26 @@ def make_histogram(region,region_info,outdir,great_ape_gene_hashes):
     savefig("%smode_hist.png"%(name),format='png')    
 
 
-    print percent_hists
-    print mode_hists
+    print(percent_hists)
+    print(mode_hists)
 
 def load_plot_regions(fn_regions):
     if fn_regions == None: return []
     plot_regions = []
     for line in open(fn_regions,'r').readlines():
         if line[0] == "#": continue
-        print line
+        print(line)
         sline = line.split()
         uID = "%s:"%(sline[1])
         uID += ":".join(sline[2:5])
         plot_regions.append(uID)
-        print uID
+        print(uID)
 
     return plot_regions
 
 def get_transcript_ids(fn_transcript_id):
 
-    print fn_transcript_id
+    print(fn_transcript_id)
     gene_id_list = open(fn_transcript_id,'r').readlines()
     transcript_ids = {} 
     for gene_info in gene_id_list:
@@ -344,15 +329,16 @@ if __name__=='__main__':
         for cell_line_line in read_cell_line_info:
             (name,cells_fixed,in_nitrogen) = cell_line_line.split(",")                            
             cell_line_info[name] = "%s,%s"%(cells_fixed,in_nitrogen.rstrip())
-            print cell_line_info[name]
+            print(cell_line_info[name])
 
-    mkdir("./",o.outdir)
-    print "loading genome information"
+    if not os.path.exists(o.outdir):
+        os.makedirs(outdir)
+
+    print("loading genome information")
     genome_info = kgf.genome_info(o.fn_input_genomes,o.fn_sex_pop_index,QC_check=o.output_cvg)
-    print "done"
+    print("done")
 
     regions_by_uID = {}
-    #print o.input_regions
 
     expected_len = 0
     if o.input_regions != None:
@@ -373,14 +359,13 @@ if __name__=='__main__':
         else:
             input_file = "%s/%s_%s"%(o.input_dir,o.input_file_name,genome_id)
 
-        print input_file
+        print(input_file)
 
         ##########check the output file exists
         #if(not(os.path.exists("%s/%s/ml_region_analysis/%s"%(primary_analysis_dir,genome_id,o.input_file_name)))):
         if not os.path.exists(input_file):
-            print "%s does not appear to exist" % (input_file)
-            print     
-            print '%s my have failed previous QC or may still be running' % (genome_id)
+            print("%s does not appear to exist" % (input_file))
+            print('%s my have failed previous QC or may still be running' % (genome_id))
             continue
         
         ##############check the output file is of the correct length
@@ -388,11 +373,11 @@ if __name__=='__main__':
         #analyzed_by_ml_lines = open("%s/%s/ml_region_analysis/%s"%(primary_analysis_dir,genome_id,o.input_file_name)).readlines()
         analyzed_by_ml_lines = open(input_file, "r").readlines()
         if(len(analyzed_by_ml_lines) != expected_len):
-            print "expected:%d encountered:%d" % (expected_len, len(analyzed_by_ml_lines))
-            print "expected number of lines in %s does not match that in %s" % (analyzed_by_ml_lines, o.input_regions)
+            print("expected:%d encountered:%d" % (expected_len, len(analyzed_by_ml_lines)))
+            print("expected number of lines in %s does not match that in %s" % (analyzed_by_ml_lines, o.input_regions))
             #continue
         
-        print "\t getting information %s" %(genome_id)
+        print("\t getting information %s" %(genome_id))
         outstr += "\t%s" % genome_id
         
         for analysis_line in analyzed_by_ml_lines:
@@ -416,20 +401,16 @@ if __name__=='__main__':
             (genome_id,fn_wssd_dir,fn_bac_dir,chunk_dir,primary_analysis_dir) = input_genomes_line.split()    
             if genome_id[0] =="#": continue
             if genome_id in region_inf.cps_by_genome:
-                #print genome_id
                 outstr+="\t%f"%(region_inf.cps_by_genome[genome_id])
             else:
-                print "ERROR genome_id not in region_info"
-                print genome_id
-                print region_inf.cps_by_genome
+                print("ERROR genome_id not in region_info")
+                print(genome_id)
+                print(region_inf.cps_by_genome)
                 sys.exit(1)
         outstr+="\n"    
 
-#    print outstr
     if o.outfile != None: 
         open("%s/%s"%(o.outdir,o.outfile),'w').write(outstr)
-        #print percent_hists[pop]
-        #print hist
 #        percent_hists[pop]=ihist + percent_hists[pop]
 #        mode_hists[pop][np.where(ihist==np.amax(ihist))[0]]+=1 
 
