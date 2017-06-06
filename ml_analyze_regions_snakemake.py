@@ -1,13 +1,15 @@
+from __future__ import print_function
+
 import sys
 from optparse import OptionParser
 
 import numpy as np
 
 from math import *
-from kitz_wssd.wssd_common_v2 import *
+from wssd_common_v2 import *
 
 import ml_get_cpn as ml_methods
-import genome_management.kg_file_handling as kgf
+import kg_file_handling as kgf
 
 class ml_analyze_regions:
     
@@ -39,23 +41,17 @@ class ml_analyze_regions:
                     (chr,start,end) = location.split()[0:3]
                     
 
-                    #print alt_contig_map
-                    #print chr
-                    #print self.mask_wssd.mContigNameLen
                     chr = alt_contig_map !=None and alt_contig_map[chr] or chr
                     TID = "%s:%s-%s"%(chr,start,end)
                     name = "%s:%s-%s"%(chr,start,end)
                     
                     if(not(chr in self.mask_wssd.mContigNameLen)):
-                        print "skipping: ", name,chr,start,end
+                        print("skipping: ", name,chr,start,end)
                         continue
-                    print "loading region... subtracting 1 from start and end", name,chr,start,end
+                    print("loading region... subtracting 1 from start and end", name,chr,start,end)
                     start = int(start)-1
                     end = min(int(end),int(self.mask_wssd.mContigNameLen[chr])-1)
-                    #print "loading region... assuming half open 0 based coordinates", name,chr,start,end
-                    #start = int(start)
-                    #end = min(int(end),int(self.mask_wssd.mContigNameLen[chr]))
-                    print start, end
+                    print(start, end)
                     
                     ######CHANGED IF SUNK    
                     if sunk_based:
@@ -70,11 +66,11 @@ class ml_analyze_regions:
                     if(win_var):
                         depth = corrected_depth[np.where(masked_region==0)]
                     else:
-                        print "THIS IS WRONG!"
+                        print("THIS IS WRONG!")
                         sys.exit(1)
                         depth = corrected_depth
 
-                    print "finished loading"
+                    print("finished loading")
                     wndstart = 0
                     len = depth.shape[0]
                     wndend = min(width,len)
@@ -99,16 +95,10 @@ class ml_analyze_regions:
                         regwnds = ml.regressMu.regrinv(wnd_means)
                                 
                         weighted_medians_idxs = np.cast['int32'](np.floor(np.arange(0,len)/float(width)))
-                        #print len
-                        #print weighted_medians_idxs
                         weighted_medians = regwnds[weighted_medians_idxs]
                             
                         #w_regressed_median = regwnds
-                        #print "fast",np.median(w_regressed_median)
-                        #print "fast",np.median(weighted_medians)
-                        #print weighted_medians
                         w_regressed_median = weighted_medians
-                        #print w_regressed_media$a
                     ##########################
                         
                     #########THIS IS THE ORIGINAL CODE
@@ -119,7 +109,6 @@ class ml_analyze_regions:
                         #    #if(wndend+width>len):
                     #    #    #    wndend = len
                     #    #    
-                    #    #    #print wndstart,wndend
                     #    #    #cp,ll = ml.get_mle_cp(depth[wndstart:wndend])
                     #        cp,ll = 0,0
                     #        regressed_cp = ml.regressMu.regrinv(depth[wndstart:wndend].mean())
@@ -139,9 +128,6 @@ class ml_analyze_regions:
                     bywnd_cp = (np.array(bywndcp)*np.array(n_bases)/total_bases).sum()
                     bywnd_regressed_mean = (np.array(regressed_bywndcp)*np.array(n_bases)/total_bases).sum()
         
-                    #print bywndcp
-                    #print bywnd_regressed_mean
-                    #print regressed_bywndcp
         
                     #if(n_windows==1):
                     #    bywnd_median = bywndcp[0]
@@ -153,19 +139,12 @@ class ml_analyze_regions:
                     #bywnd_median = np.median(w_ml_median) 
                     bywnd_median = 0 
                     bywnd_regressed_median = np.median(w_regressed_median)
-                    #print w_regressed_median, name, chr 
-                    #print bywnd_regressed_median
-                    #print "3", w_regressed_median
             
                     #whole_reg_cp,ll = ml.get_mle_cp(depth)
                     whole_reg_cp,ll = 0,0
                     #whole_reg_regressed_cp = ml.regressMu.regrinv(depth.mean())
                     whole_reg_regressed_cp = 0
                     
-                    #print bywndcp
-                    #print bywnd_cp
-                    #print round(bywnd_cp)
-                    #print "%s %s %s %d %s %d %f %f %f %f %f %f\n"%(TID,name,chr,start+1,end,whole_reg_cp,bywnd_cp,bywnd_median,ll,whole_reg_regressed_cp,bywnd_regressed_mean,bywnd_regressed_median)
                     FOUT.write("\t".join(map(str,[TID,name,chr,start+1,end,whole_reg_cp,bywnd_cp,bywnd_median,ll,whole_reg_regressed_cp,bywnd_regressed_mean,bywnd_regressed_median])) + "\n")
 
             self.combined_adjusted_wssd.tbl.close()
@@ -209,14 +188,12 @@ if __name__=='__main__':
     #    finished_lines =open(o.fn_finished,'r').readlines()
     #    for line in finished_lines:
     #        genome_name = line.split("/")[9]
-    #        print genome_name
     #        finished.append(genome_name)
 
     for in_genome in in_genomes:
         (genome,fn_wssd_dir,fn_bac_dir,chunk_dir,primary_analysis_dir) = in_genome.split()
         #if(o.fn_finished!=None):
         #    if(not(genome in finished)): 
-        #        print "genome not complete yet",genome
         #        continue
         
         if o.alt_primary_analysis_lambda:
@@ -229,18 +206,17 @@ if __name__=='__main__':
 
             wssd_lib_dir = "%s/%s"%(fn_wssd_dir,genome)
             bac_analysis_lib_dir = "%s/%s"%(fn_bac_dir,genome_dir_name)
-            print genome, genome_dir_name
+            print(genome, genome_dir_name)
             #filtered_libs_dir = "%s/_filtered_libs_analysis.GC2"%(bac_analysis_lib_dir,fn_comb_corr)
             #if(not(os.path.exists(filtered_libs_dir))):
-            #    print "error... filtered_libs_dir does not exist"
             fnfit_params = "%s/%s"%(bac_analysis_lib_dir,o.fn_param)
             #ml_class = ml_methods.ml_get_cp2_trunc_gaussian_twoPieceRegress(fnfit_params,lUseCp=[2,None],thruZero=True,max_cp=200)
         
             genome_analysis_dir = "%s/%s"%(primary_analysis_dir,genome)
             
             if o.out_dir == None:
-                outdir = "%s/%s" % (fn_genome_analysis_dir, "ml_region_analysis"
-                if not os.path.exists(outdir)):
+                outdir = "%s/%s" % (fn_genome_analysis_dir, "ml_region_analysis")
+                if not os.path.exists(outdir):
                     os.makedirs(outdir)
                 fn_out = "%s/%s"%(outdir,o.fn_output_name)
             else:
@@ -252,4 +228,4 @@ if __name__=='__main__':
             ml_class = ml_methods.ml_get_cp2_trunc_gaussian(fnfit_params,lUseCp=[2,6],thruZero=True,max_cp=250)
             ml_analyze_regions(ml_class,in_locations,genome_analysis_dir,o.fn_contigs,o.fn_mask,fn_out,o.fn_comb_corr,width=o.window_width,sunk_based=o.sunk_based,alt_wssd_contigs=o.alt_wssd_contigs,alt_contig_map=alt_contig_map)
         else:
-            print "FAILED"
+            print("FAILED")
