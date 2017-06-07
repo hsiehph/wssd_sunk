@@ -55,10 +55,10 @@ class ml_analyze_regions:
                     
                     ######CHANGED IF SUNK    
                     if sunk_based:
-                        corrected_depth = self.combined_adjusted_wssd.depth["wssd.combined_corrected"][chr][start:end,0,1]
+                        corrected_depth = self.combined_adjusted_wssd.depth["wssd.combined_corrected"][chr][start:end,0,1].astype(np.float64)
                         masked_region = self.mask_wssd["isntSunkOrIsMasked"][chr][start:end]
                     else:
-                        corrected_depth = self.combined_adjusted_wssd.depth["wssd.combined_corrected"][chr][start:end,:,0].sum(1)
+                        corrected_depth = self.combined_adjusted_wssd.depth["wssd.combined_corrected"][chr][start:end,:,0].astype(np.float64).sum(1)
                         masked_region = self.mask_wssd["mask"][chr][start:end,:].sum(1)>0
                     
                     #########BEFORE YOU FREAK OUT!!! READ THIS!!!! <RELAX> YOU'RE OK
