@@ -30,6 +30,7 @@ def file_exists(ls,file):
   return 0
 
 
+# cannot find the hard-coded file "corrupted". maybe not important?
 def in_corrupted(genome):
 	corrupted_genomes = open("/net/gs/vol1/home/psudmant/EEE_Lab/1000G/analysis_files/input_genomes/corrupted").readlines()
 	for g in corrupted_genomes:
