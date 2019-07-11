@@ -1,6 +1,6 @@
 import os,sys
 import os.path
-import cPickle
+import pickle
 import pickle 
 from optparse import OptionParser
 from wssd_common_v2 import *
@@ -30,7 +30,7 @@ if __name__=='__main__':
                                                 o.fn_mask,
                                                 overwrite=False,
                                                 openMode='r' )
-    print>>stderr, "%s/%s"%(o.fn_out_prefix,in_genome)    
+    print("%s/%s"%(o.fn_out_prefix,in_genome), file=stderr)    
     out_wnd_DTS = DenseTrackSet(o.fn_wnd_contig_file,
                                                             "%s_%s"%(o.fn_out_prefix,in_genome),
                                                             overwrite=True,
@@ -44,14 +44,14 @@ if __name__=='__main__':
     out_wnd_DTS['ends'].addArray(tables.UInt32Atom(),[])
     ###WE ONLY NEED THE STARTS because start[k],start[k+1] == start[k], end[k]
     
-    print >>stderr, "input genome: %s"%in_genome
-    print >>stderr,"loading regions..." 
+    print("input genome: %s"%in_genome, file=stderr)
+    print("loading regions...", file=stderr) 
     F_region_pickle=open(o.wnd_pickle,"rb")
-    regions_chrms,regions_coords,regions_wnds = cPickle.load(F_region_pickle) 
-    print >>stderr,"done "
+    regions_chrms,regions_coords,regions_wnds = pickle.load(F_region_pickle) 
+    print("done ", file=stderr)
 
 #read in base genome data
-    print >>stderr,"getting...copies"
+    print("getting...copies", file=stderr)
 
     g_data=genome_data(in_genome,"%s/%s/combined_corrected_wssd/%s"%(in_primary_analysis_dir,
                                                                         in_genome,o.fn_comb_corr),
@@ -64,7 +64,7 @@ if __name__=='__main__':
     curr_chr=None
     curr_wnd_bin=0
 
-    for xi in xrange(len(regions_chrms)):
+    for xi in range(len(regions_chrms)):
         chr=regions_chrms[xi]
         start,end= regions_coords[xi]
         wnds = regions_wnds[xi]
@@ -75,7 +75,7 @@ if __name__=='__main__':
             curr_chr=chr
             curr_wnd_bin=0
 
-        print "REGION",chr,start,end,wnds.shape, o.wnd_width
+        print("REGION",chr,start,end,wnds.shape, o.wnd_width)
         regressions=g_data.get_regression(chr,start,end,wnds,mask,int(o.wnd_width))
         l_regressions=regressions.shape[0]
         #print regressions
