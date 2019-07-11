@@ -30,7 +30,7 @@ class gglob:
             if os.path.exists("%s/%s%s"%(sunk_DTS_dir, DTS_prefix, indiv )):
                 indivs.append(indiv)
             else:
-                print >>stderr, "skipping: %s - no associated sunk DTS"%indiv
+                print("skipping: %s - no associated sunk DTS"%indiv, file=stderr)
         return indivs
 
     @classmethod
@@ -82,7 +82,7 @@ class gglob:
         correct = not (contig in ["chrY", "chrX"])
 
         for i, indiv in enumerate(indivs):
-            print >> stderr, indiv
+            print(indiv, file=stderr)
             wnd_cp = wnd_cp_indiv("%s%s"%(DTS_pre, indiv),
                                   fn_contigs,
                                   wnd_size)
@@ -209,14 +209,14 @@ class gglob:
                 "sunk_cp_matrix":self.sunk_cp_matrix
                }
          
-        for k, mat in mats.iteritems():
-            print >>stderr, "writing out %s..."%k
+        for k, mat in mats.items():
+            print("writing out %s..."%k, file=stderr)
             t=time.time()
             df = pd.DataFrame(mat)
             df.to_hdf("%s.%s.h5"%(fn_out,k),k,complevel=1,complib='zlib')
-            print >>stderr, "done (%fs)"%(time.time()-t)
+            print("done (%fs)"%(time.time()-t), file=stderr)
         
-        print >>stderr, "done (%f)"%(time.time()-t)
+        print("done (%f)"%(time.time()-t), file=stderr)
 
 
 
@@ -267,7 +267,7 @@ if __name__=="__main__":
             if os.path.exists("%s/%s%s"%(o.sunk_DTS_dir, o.DTS_prefix, indiv )):
                 indivs.append(indiv)
             else:
-                print >>stderr, "skiping: %s - no associated sunk DTS"
+                print("skiping: %s - no associated sunk DTS", file=stderr)
         
         idx_data = {"indivs":indivs, "wnd_size":o.wnd_size, "wnd_slide":o.wnd_slide}
 

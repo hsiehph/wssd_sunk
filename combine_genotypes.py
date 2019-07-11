@@ -81,4 +81,4 @@ if __name__=="__main__":
             gts = "\t".join(["%d"%(gts_by_indiv[i]) for i in indivs])
         #gX.simple_plot("%s/%s_%d_%d.pdf"%(args.plot_dir, contig,s,e))
         FOUT.write("%s\t%d\t%d\t%s\t%s\n"%(contig, s, e, name, gts))
-        print i, "%s\t%d\t%d\t%s\t%s\n"%(contig, s, e, name, gts)
+        print(i, "%s\t%d\t%d\t%s\t%s\n"%(contig, s, e, name, gts))

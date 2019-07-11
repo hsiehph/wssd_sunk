@@ -1,4 +1,4 @@
-from __future__ import print_function
+
 
 import sys
 import os
@@ -66,7 +66,7 @@ def make_output_file(region,region_info,outdir,cell_line_info,genome_info):
     FOUT = open(outfile_name,'w')
     FOUT.write("indiv,cp,pop,cell lines fixed, cell lines in Nitrogen,coverage\n")
 
-    for indiv,cp in region_info.cps_by_genome.iteritems():
+    for indiv,cp in region_info.cps_by_genome.items():
         pop = region_info.pop_by_genome[indiv]
         output = indiv in cell_line_info and cell_line_info[indiv] or ""
         output = "%s,%d,%s,%s,%f\n"%(indiv,cp,pop,output,genome_info.genomes[indiv].coverage)
@@ -88,7 +88,7 @@ def make_simple_plot(region,region_info,outdir,cell_line_info,genome_info):
 
     colors = {'Yoruba':'r','European':'b','Asian':'g'}
 
-    for indiv,cp in region_info.cps_by_genome.iteritems():
+    for indiv,cp in region_info.cps_by_genome.items():
         cvg = genome_info.genomes[indiv].coverage
         fixed_cell_line = cell_line_info[indiv].split(",")[0].rstrip() == "yes"
         liquid_nitrogen_cell_line = cell_line_info[indiv].split(",")[1].rstrip() == "yes"
@@ -117,7 +117,7 @@ def make_histogram(region,region_info,outdir,great_ape_gene_hashes):
 
     great_ape_cps = {}
     if do_apes:
-        for ape,gene_hash in great_ape_gene_hashes.iteritems():
+        for ape,gene_hash in great_ape_gene_hashes.items():
             if not region_info.TID in gene_hash:
                 do_apes=False
                 print("ID does not exist for APE")
@@ -132,7 +132,7 @@ def make_histogram(region,region_info,outdir,great_ape_gene_hashes):
     left, width = 0.1, 0.8
     rect1 = [left, 0.1, width, 0.8] #left, bottom, width, height
 
-    for pop,freq_info in region_info.frequencies_by_pop.iteritems():
+    for pop,freq_info in region_info.frequencies_by_pop.items():
         #nbins = int(round(max(nbins,max(freq_info))))
         mx=int(max(max(freq_info),mx))
         mn=int(min(min(freq_info),mn))
@@ -143,7 +143,7 @@ def make_histogram(region,region_info,outdir,great_ape_gene_hashes):
     labels = []
 
     pop_to_hists = {}
-    for pop,freq_info in region_info.frequencies_by_pop.iteritems():
+    for pop,freq_info in region_info.frequencies_by_pop.items():
         print(pop,freq_info)
         pop_to_hists[pop] = np.histogram(np.array(freq_info),bins=nbins,range=[mn,mx],normed=True,new=True)[0]
         print(np.histogram(np.array(freq_info),bins=nbins,range=[mn,mx],normed=True,new=True))
@@ -169,13 +169,13 @@ def make_histogram(region,region_info,outdir,great_ape_gene_hashes):
     starty = .9
     sub=.03
     i=0
-    for pop,freqs in region_info.frequencies_by_pop.iteritems():
+    for pop,freqs in region_info.frequencies_by_pop.items():
         med = np.median(np.array(freqs))
         sig2 = np.array(freqs).var()
         leg.append("%s med: %d var: %.1f"%(pop,int(med),sig2))
         i+=1
 
-    for pop,hist in pop_to_hists.iteritems():
+    for pop,hist in pop_to_hists.items():
         bars[pop] = ax.bar(x+k*width,hist,width,color=colors[k],alpha=0.5)
         leg_colors.append(colors[k])
         #ax.legend(bars[pop][0],pop)
@@ -185,7 +185,7 @@ def make_histogram(region,region_info,outdir,great_ape_gene_hashes):
     ape_colors = ['orange','purple','yellow','brown']
     k=0
     if do_apes:
-        for ape,cp in great_ape_cps.iteritems():
+        for ape,cp in great_ape_cps.items():
             bars_ape = ax.bar(np.array([cp]),np.array([.1]),width/2,color=ape_colors[k],alpha=.8)
             leg.append("%s %f"%(ape,cp))
             lines.append(bars_ape[0])
@@ -209,7 +209,7 @@ def make_histogram(region,region_info,outdir,great_ape_gene_hashes):
 
     k=0
     
-    for pop,ihist in percent_hists.iteritems():
+    for pop,ihist in percent_hists.items():
         percent_hists[pop] = ihist/ihist.sum()
         #jhplot(x,hist,"|%s"%(colors[k]))
         #hist(x)
@@ -222,14 +222,14 @@ def make_histogram(region,region_info,outdir,great_ape_gene_hashes):
     print(leg)
     legend(leg)
     
-    f.get_axes()[0].xaxis.set_ticks(range(21))
+    f.get_axes()[0].xaxis.set_ticks(list(range(21)))
     #f.add_axes([0,40,0,1],xticks=[0,1,2,3,4,5,6,8,9,10,11,12,13,14,15,16,17,18,19,20],label='axis2',axisbg='g')
     #[0,1,2,3,4,5,6,8,9,10,11,12,13,14,15,16,17,18,19,20])
     
     f=figure(2)
     k=0
 
-    for pop,ihist in mode_hists.iteritems():
+    for pop,ihist in mode_hists.items():
         mode_hists[pop] = ihist/ihist.sum()
         #plot(x,hist,"|%s"%(colors[k]))
         #hist(x)
@@ -239,7 +239,7 @@ def make_histogram(region,region_info,outdir,great_ape_gene_hashes):
     title("Predicted copy number %s"%(name))
     xlabel("predicted copy number")
     ylabel("percentage of population")
-    f.get_axes()[0].xaxis.set_ticks(range(21))
+    f.get_axes()[0].xaxis.set_ticks(list(range(21)))
     savefig("%smode_hist.png"%(name),format='png')    
 
 
@@ -393,7 +393,7 @@ if __name__=='__main__':
             regions_by_uID[uID].add_info_from_genome(cp,genome_ob)                
 
     outstr+="\n"
-    for region_uID, region_inf in regions_by_uID.iteritems():
+    for region_uID, region_inf in regions_by_uID.items():
         
         outstr+="\t".join([region_inf.name,region_inf.chr,region_inf.start,region_inf.end,region_inf.transcript_id])
         #for genome_id,genome in genome_info.genomes.iteritems():
